@@ -38,7 +38,7 @@
 ### Requirements
 
 * terraform v0.12.23 + provider.aws v3.14.1
-* awscli 2.0.61
+* awscli 1.18.172
 
 ## License
 
