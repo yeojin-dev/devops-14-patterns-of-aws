@@ -28,6 +28,6 @@ echo "[${USER_NAME}]"
 echo "aws_access_key_id = ${ACCESS_KEY_ID}"
 echo "aws_secret_access_key = ${SECRET_ACCESS_KEY}"
 printf "\n"
-echo "write the credential below in ~/.aws/credentials"
+echo "write the credential above in ~/.aws/credentials"
 
 echo 'finish'
