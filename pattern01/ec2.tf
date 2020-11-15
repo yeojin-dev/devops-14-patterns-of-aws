@@ -86,7 +86,7 @@ resource "aws_ebs_volume" "event" {
 // 재부팅하더라도 자동으로 탑재 필요하면 아래 문서
 // https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/device_naming.html#available-ec2-device-names
 resource "aws_volume_attachment" "event" {
-  device_name = "nvme1n1"
+  device_name = "/dev/xvdf"
   instance_id = aws_instance.event.id
   volume_id = aws_ebs_volume.event.id
 }
