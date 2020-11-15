@@ -73,3 +73,20 @@ resource "aws_eip" "event" {
   instance = aws_instance.event.id
   vpc = true
 }
+
+resource "aws_ebs_volume" "event" {
+  availability_zone = "ap-northeast-2a"
+  size = 1  // gigabyte
+}
+
+// 볼륨 연결 이후 마운트 필요
+// sudo mkfs -t xfx /dev/nvme1n1
+// sudo mkdir data
+// sudo mount /dev/nvme1n1 /data
+// 재부팅하더라도 자동으로 탑재 필요하면 아래 문서
+// https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/device_naming.html#available-ec2-device-names
+resource "aws_volume_attachment" "event" {
+  device_name = "nvme1n1"
+  instance_id = aws_instance.event.id
+  volume_id = aws_ebs_volume.event.id
+}
