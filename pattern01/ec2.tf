@@ -16,6 +16,25 @@ resource "aws_instance" "event" {
   vpc_security_group_ids = [
     aws_security_group.event.id
   ]
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo yum -y update",
+      "sudo amazon-linux-extras install -y lamp-mariadb10.2-php7.2 php7.2",
+      "sudo yum install -y httpd mariadb-server",
+      "sudo systemctl start httpd",
+      "sudo systemctl enable httpd",
+      "sudo systemctl start mariadb",
+      "sudo systemctl enable mariadb",
+    ]
+  }
+  connection {
+    type = "ssh"
+    user = "ec2-user"
+    password = ""
+    private_key = file("~/.ssh/devops_14_patterns_of_aws")
+    host = self.public_ip
+  }
 }
 
 resource "aws_security_group" "event" {
