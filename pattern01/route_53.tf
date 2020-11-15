@@ -18,5 +18,5 @@ resource "aws_route53_record" "dev_domain" {
   name = "dev-domain"
   type = "CNAME"
   ttl = "30"
-  records = [aws_instance.event.public_dns]
+  records = [aws_eip.event.public_dns]
 }
