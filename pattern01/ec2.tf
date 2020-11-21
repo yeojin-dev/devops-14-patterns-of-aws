@@ -77,6 +77,7 @@ resource "aws_eip" "event" {
 resource "aws_ebs_volume" "event" {
   availability_zone = "ap-northeast-2a"
   size = 1  // gigabyte
+  // type = "io1"  // 프로비저닝된 IOPS
 }
 
 // 볼륨 연결 이후 마운트 필요
