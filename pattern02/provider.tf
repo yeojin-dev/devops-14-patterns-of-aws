@@ -8,3 +8,7 @@ terraform {
     aws = "=3.14.1"
   }
 }
+
+module "vpc" {
+  source = "./vpc"
+}
