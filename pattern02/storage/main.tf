@@ -48,3 +48,94 @@ resource "aws_security_group_rule" "enterprise_instance_egress" {
   cidr_blocks = ["0.0.0.0/0"]
   type = "egress"
 }
+
+resource "aws_s3_bucket" "enterprise" {
+  bucket = "devops-14-patterns-of-aws-enterprise"
+  acl = "private"  // CF 연결할 때 public acl 설정하지 않아도 됨
+
+  // CF 통해서만 오브젝트 접근 가능
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowAccessIdentity",
+      "Action": ["s3:GetObject"],
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "${aws_cloudfront_origin_access_identity.enterprise.iam_arn}"
+      },
+      "Resource": "arn:aws:s3:::devops-14-patterns-of-aws-enterprise/*"
+    }
+  ]
+}
+EOF
+
+}
+
+resource "aws_cloudfront_origin_access_identity" "enterprise" {
+  comment = "enterprise"
+}
+
+resource "aws_cloudfront_distribution" "enterprise" {
+  origin {
+    domain_name = aws_s3_bucket.enterprise.bucket_regional_domain_name
+    origin_id   = "enterprise-origin-id"
+
+    s3_origin_config {
+      origin_access_identity = aws_cloudfront_origin_access_identity.enterprise.cloudfront_access_identity_path
+    }
+  }
+
+  enabled             = true
+  is_ipv6_enabled     = false
+  comment             = "enterprise static resource"
+  default_root_object = "index.html"
+
+  //  logging_config {
+  //    include_cookies = false
+  //    bucket          = "mylogs.s3.amazonaws.com"
+  //    prefix          = "myprefix"
+  //  }
+  //
+  //  aliases = ["mysite.example.com", "yoursite.example.com"]
+
+  default_cache_behavior {
+    allowed_methods = [
+      "DELETE",
+      "GET",
+      "HEAD",
+      "OPTIONS",
+      "PATCH",
+      "POST",
+      "PUT",
+    ]
+    cached_methods = [
+      "GET",
+      "HEAD",
+    ]
+    target_origin_id = "enterprise-origin-id"
+
+    forwarded_values {
+      query_string = false
+
+      cookies {
+        forward = "none"
+      }
+    }
+    viewer_protocol_policy = "allow-all"
+    min_ttl = 0
+    default_ttl = 3600
+    max_ttl = 86400
+  }
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+    }
+  }
+
+  viewer_certificate {
+    cloudfront_default_certificate = true
+  }
+}
