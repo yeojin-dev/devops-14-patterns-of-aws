@@ -4,7 +4,8 @@ resource "aws_db_instance" "enterprise" {
   engine = "mysql"
   engine_version = "5.7"
   instance_class = "db.t2.micro"
-  name = "enterprise"
+  name = "enterprise"  // 기본 데이터베이스 스키마
+  identifier = "enterprise-db"
 
   // TODO: 변수 처리
   username = "foo"
