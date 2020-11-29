@@ -2,7 +2,7 @@ resource "aws_lb" "intra" {
   name = "intra-alb"
   internal = true
   load_balancer_type = "application"
-  security_groups = []
+  security_groups = [aws_security_group.intra_alb.id]
   subnets = [var.subnet_a_id, var.subnet_b_id]
 }
 
