@@ -95,3 +95,51 @@ resource "aws_security_group_rule" "intra_instance_egress" {
   cidr_blocks = ["0.0.0.0/0"]
   type = "egress"
 }
+
+resource "aws_autoscaling_policy" "intra_scale_up" {
+  autoscaling_group_name = aws_autoscaling_group.intra.name
+  name = "agents-scale-up"
+  adjustment_type = "ChangeInCapacity"
+  cooldown = 300
+  scaling_adjustment = 1
+}
+
+resource "aws_autoscaling_policy" "intra_scale_down" {
+  autoscaling_group_name = aws_autoscaling_group.intra.name
+  name = "agents-scale-down"
+  adjustment_type = "ChangeInCapacity"
+  cooldown = 300
+  scaling_adjustment = -1
+}
+
+resource "aws_cloudwatch_metric_alarm" "cpu_high" {
+  alarm_name = "cpu-util-high-agents"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods = "2"
+  metric_name = "CPUUtilization"
+  namespace = "AWS/EC2"
+  period = "300"
+  statistic = "Average"
+  threshold = "80"
+  alarm_description = "This metric monitors ec2 cpu for high utilization on agent hosts"
+  alarm_actions = [aws_autoscaling_policy.intra_scale_up.arn]
+  dimensions = {
+    AutoScalingGroupName = aws_autoscaling_group.intra.name
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "cpu_low" {
+  alarm_name = "cpu-util-low-agents"
+  comparison_operator = "LessThanOrEqualToThreshold"
+  evaluation_periods = "2"
+  metric_name = "CPUUtilization"
+  namespace = "AWS/EC2"
+  period = "300"
+  statistic = "Average"
+  threshold = "80"
+  alarm_description = "This metric monitors ec2 cpu for high utilization on agent hosts"
+  alarm_actions = [aws_autoscaling_policy.intra_scale_down.arn]
+  dimensions = {
+    AutoScalingGroupName = aws_autoscaling_group.intra.name
+  }
+}
