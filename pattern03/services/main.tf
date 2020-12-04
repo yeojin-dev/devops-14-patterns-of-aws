@@ -143,3 +143,21 @@ resource "aws_cloudwatch_metric_alarm" "cpu_low" {
     AutoScalingGroupName = aws_autoscaling_group.intra.name
   }
 }
+
+resource "aws_autoscaling_schedule" "intra_night" {
+  autoscaling_group_name = aws_autoscaling_group.intra.name
+  scheduled_action_name = "intra-night"
+  min_size = 1
+  max_size = 1
+  desired_capacity = 1
+  recurrence = "0 23 * * *"
+}
+
+resource "aws_autoscaling_schedule" "intra_day" {
+  autoscaling_group_name = aws_autoscaling_group.intra.name
+  scheduled_action_name = "intra-day"
+  min_size = 1
+  max_size = 2
+  desired_capacity = 1
+  recurrence = "0 9 * * *"
+}
