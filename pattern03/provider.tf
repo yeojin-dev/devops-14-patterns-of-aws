@@ -20,3 +20,11 @@ module "services" {
   subnet_a_id = module.vpc.subnet_a_id
   subnet_b_id = module.vpc.subnet_b_id
 }
+
+module "storage" {
+  source = "./storage"
+
+  vpc_id = module.vpc.vpc_id
+  subnet_a_id = module.vpc.subnet_a_id
+  subnet_b_id = module.vpc.subnet_b_id
+}
