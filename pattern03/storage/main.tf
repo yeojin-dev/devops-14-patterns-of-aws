@@ -52,16 +52,17 @@ resource "aws_rds_cluster" "intra" {
   skip_final_snapshot = true
 }
 
-// AWS Aurora replica
+// AWS Aurora instances
 resource "aws_rds_cluster_instance" "intra_replica" {
+  count = 3  // 1대는 writer, 나머지는 reader 인스턴스로 생성됨
+
   cluster_identifier = aws_rds_cluster.intra.id
   // 가능한 인스턴스 클래스 확인
   // https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Concepts.DBInstanceClass.html
   instance_class = "db.t2.small"
-  identifier = "intra-aurora-replica"
+  identifier = "intra-aurora-replica-${count.index}"
   engine = aws_rds_cluster.intra.engine
   engine_version = aws_rds_cluster.intra.engine_version
-
 }
 
 resource "aws_db_subnet_group" "intra" {
